@@ -11,7 +11,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            title: 'New Project',
+            title: 'To Do List',
             template: path.resolve(__dirname, 'src/temp.html'),
         }),
     ],
