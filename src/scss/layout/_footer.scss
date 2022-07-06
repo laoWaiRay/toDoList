@@ -1,0 +1,28 @@
+.footer{
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.283);
+    background-color: #000;
+}
+
+.footer-text-main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.odin-logo{
+    height: 3.5rem;
+    width: auto;
+    margin-left: 2rem;
+}
+
+.github-cat{
+    fill: black;
+    margin-left: 2rem;
+    transition: transform 2s;
+    height: 3.5rem;
+
+    &:hover{
+        transform: rotate(360deg);
+    }
+}

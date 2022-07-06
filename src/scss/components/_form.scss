@@ -1,6 +1,21 @@
+.form-container{
+    display: none;
+}
+
+.form-container--createProject{
+    display: 'block';
+}
+
 .form{
-    
-    &__group{
+
+    &__input{
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: 400;
+        color: inherit;
+        background-color: transparent;
+        border: 0;
+        outline: none;
         padding: 1rem 0;
     }
 }

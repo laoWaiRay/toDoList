@@ -1,7 +1,46 @@
 //Dependencies List
 import "./scss/main.scss";
+import heroImage from "./img/hero.jpg";
+import sprite from "./sprite.svg";
 
 //DOM Query Selectors
+
+const hero = document.querySelector('.hero');
+hero.src = heroImage;
+
+const createProjectBtn = document.querySelector('.create-project-btn');
+createProjectBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if(projectList.lastChild.nodeName === 'FORM') return;
+    const form = document.createElement('form');
+    const formInput = document.createElement('input');
+    formInput.classList.add('form__input');
+    formInput.setAttribute('type', 'text');
+    formInput.setAttribute('placeholder', 'New Project');
+    projectList.append(form);
+    form.append(formInput);
+    formInput.focus();
+
+
+    form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        if (!formInput.value) return;
+        const projects = projectManager.getProjects();
+        if(projects.filter(project => project.name === formInput.value).length > 0) return;   // check for existing project name
+        projectManager.createProject(formInput.value);
+        projectManager.changeCurrentProject(projectManager.getProject(formInput.value));
+        domManager.showProjects();
+        domManager.showToDos();
+        formInput.value = '';
+    })
+})
+
+document.body.addEventListener('click', (e)=>{
+    if(projectList.lastChild.nodeName === 'FORM' && e.target.nodeName != 'INPUT') projectList.lastChild.remove();
+})
+
+
+
 
 const createToDoForm = document.querySelector('#createToDoForm');
 const createToDoFormInputs = document.querySelectorAll('#createToDoForm .form__input');
@@ -15,8 +54,6 @@ const projectList = document.querySelector('.project-list');
 const toDoList = document.querySelector('.to-do-list');
 
 
-const createProjectForm = document.querySelector('#createProjectForm');
-const newProjectNameInput = document.querySelector('#newProjectName');
 
 
 const ToDoItem = function(title, dueDate, description, priority, completed){       //factory functions
@@ -154,9 +191,25 @@ const toDoManager = (function(){
 
 const domManager = (function(){
 
+    function setActiveProjectLink(){
+        const projectListItems = document.querySelectorAll('.project-list__item');
+        const currentProject = projectManager.getCurrentProject();
+        projectListItems.forEach(item => {
+            item.classList.remove('active');
+            if(item.innerText === currentProject.name){
+                item.classList.add('active');
+                const closeBtn = document.createElement('button');
+                closeBtn.classList.add('btn-close-project');
+                closeBtn.append('x');
+                item.append(closeBtn);
+            } 
+        })
+
+        
+    }
 
     function removeProjectCloseBtns(){
-        const closeBtns = document.querySelectorAll('.project__close');
+        const closeBtns = document.querySelectorAll('.btn-close-project');
         closeBtns.forEach(btn => {
             btn.remove();
         })  
@@ -172,38 +225,23 @@ const domManager = (function(){
         projects.forEach(project => {
             const projectListItem = document.createElement('li');
             projectListItem.classList.add('project-list__item');
-            projectListItem.append(project.name);
+            const projectListTextWrapper = document.createElement('span');
+            projectListTextWrapper.classList.add('project-list__text-wrapper');
+            projectListTextWrapper.append(project.name);
+            projectListItem.append(projectListTextWrapper);
             projectList.appendChild(projectListItem);
 
-            projectListItem.addEventListener('click', () => {
+            projectListItem.addEventListener('click', (e) => {
+                e.stopPropagation();
                 projectManager.changeCurrentProject(project);
+                domManager.showProjects();
                 domManager.showToDos();
             });
-
-            projectListItem.addEventListener('click', (e)=>{
-                e.stopPropagation();
-                removeProjectCloseBtns();
-                
-                if(!projectListItem.firstElementChild){
-                    const closeBtn = document.createElement('button');
-                    closeBtn.classList.add('project__close');
-                    closeBtn.append('x');
-
-                    closeBtn.addEventListener('click', (e)=>{
-                        e.stopPropagation();
-                        projectManager.deleteProject(project);
-                        domManager.showProjects();
-                        domManager.showToDos();
-                    })
-
-                    projectListItem.append(closeBtn);
-                }
-            })            
+        
+                        
         })
 
-        document.body.addEventListener('click', (e)=>{
-                removeProjectCloseBtns();       
-        })
+        setActiveProjectLink();
         
     }
 
@@ -330,16 +368,3 @@ createToDoForm.addEventListener('submit', (e)=>{
         input.value = '';
     })
 })
-
-
-createProjectForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if (!newProjectNameInput.value) return;
-    projectManager.createProject(newProjectNameInput.value);
-    projectManager.changeCurrentProject(projectManager.getProject(newProjectNameInput.value));
-    domManager.showProjects();
-    domManager.showToDos();
-    newProjectNameInput.value = '';
-})
-
-
