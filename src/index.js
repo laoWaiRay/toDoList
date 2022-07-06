@@ -5,10 +5,24 @@ import sprite from "./sprite.svg";
 
 //DOM Query Selectors
 
+
+const createToDoForm = document.querySelector('#createToDoForm');
+const createToDoFormInputs = document.querySelectorAll('#createToDoForm .form__input');
+const titleInput = document.querySelector('#title');
+const dueDateInput = document.querySelector('#dueDate');
+const priorityInput = document.querySelector('#priority');
+const descriptionInput = document.querySelector('#description');
+
+
+
+const projectList = document.querySelector('.project-list');
+const toDoList = document.querySelector('.to-do-list');
+
 const hero = document.querySelector('.hero');
 hero.src = heroImage;
 
 const createProjectBtn = document.querySelector('.create-project-btn');
+
 createProjectBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     if(projectList.lastChild.nodeName === 'FORM') return;
@@ -20,6 +34,14 @@ createProjectBtn.addEventListener('click', (e) => {
     projectList.append(form);
     form.append(formInput);
     formInput.focus();
+
+    window.addEventListener('click', e => {
+        if(form.contains(e.target)){
+            console.log('clicked in form')
+        } else{
+            form.remove();
+        }
+    })
 
 
     form.addEventListener('submit', (e)=>{
@@ -35,23 +57,9 @@ createProjectBtn.addEventListener('click', (e) => {
     })
 })
 
-document.body.addEventListener('click', (e)=>{
-    if(projectList.lastChild.nodeName === 'FORM' && e.target.nodeName != 'INPUT') projectList.lastChild.remove();
-})
 
 
 
-
-const createToDoForm = document.querySelector('#createToDoForm');
-const createToDoFormInputs = document.querySelectorAll('#createToDoForm .form__input');
-const titleInput = document.querySelector('#title');
-const dueDateInput = document.querySelector('#dueDate');
-const priorityInput = document.querySelector('#priority');
-const descriptionInput = document.querySelector('#description');
-
-
-const projectList = document.querySelector('.project-list');
-const toDoList = document.querySelector('.to-do-list');
 
 
 
@@ -82,6 +90,7 @@ const projectManager = (function(){        //module
     function createProject(name){
         const newProject = Project(name);
         projects.push(newProject);
+        return newProject;
     }
 
     function getProjects(){
@@ -118,7 +127,6 @@ const projectManager = (function(){        //module
         return defaultProject;
     }
 
-
     const deleteProject = function(deletedProject){
         const indexOfDeletedProject = projects.findIndex(project => project.name === deletedProject.name);
         projects.splice(indexOfDeletedProject, 1);
@@ -129,8 +137,6 @@ const projectManager = (function(){        //module
         } else {
             changeCurrentProject(projects[0]);
         }
-
-        console.log(projects, currentProject)
     }
 
     return {
@@ -202,17 +208,18 @@ const domManager = (function(){
                 closeBtn.classList.add('btn-close-project');
                 closeBtn.append('x');
                 item.append(closeBtn);
+
+
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    projectManager.deleteProject(currentProject);
+                    domManager.showProjects();
+                    domManager.showToDos();
+                })
             } 
         })
 
         
-    }
-
-    function removeProjectCloseBtns(){
-        const closeBtns = document.querySelectorAll('.btn-close-project');
-        closeBtns.forEach(btn => {
-            btn.remove();
-        })  
     }
 
     function showProjects(){
@@ -233,11 +240,46 @@ const domManager = (function(){
 
             projectListItem.addEventListener('click', (e) => {
                 e.stopPropagation();
+                if(project === projectManager.getCurrentProject()) return;
                 projectManager.changeCurrentProject(project);
                 domManager.showProjects();
                 domManager.showToDos();
             });
         
+            projectListItem.addEventListener('dblclick', (e)=>{
+                e.stopPropagation();
+                if(projectList.lastChild.nodeName === 'FORM') return;
+
+                const form = document.createElement('form');
+                const formInput = document.createElement('input');
+                formInput.classList.add('form__input');
+                formInput.setAttribute('type', 'text');
+                formInput.value = project.name;
+                projectListItem.replaceWith(form);
+                form.append(formInput);
+                formInput.focus();
+
+                window.addEventListener('click', e => {
+                    if(form.contains(e.target)){
+                        console.log('clicked in form')
+                    } else{
+                        form.replaceWith(projectListItem);
+                    }
+                })
+
+                form.addEventListener('submit', (e)=>{
+                    e.preventDefault();
+                    const projects = projectManager.getProjects();
+                    if(projects.filter(project => project.name === formInput.value).length > 0){
+                        form.replaceWith(projectListItem);
+                    } else {
+                        projectManager.editProjectName(project, formInput.value)
+                        form.remove();
+                    }
+                    domManager.showProjects();
+                    domManager.showToDos();
+                })
+            })
                         
         })
 

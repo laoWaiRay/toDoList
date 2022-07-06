@@ -1,7 +1,8 @@
 .footer{
     padding: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.283);
-    background-color: #000;
+    // border-top: 1px solid rgba(0, 0, 0, 0.283);
+    background-color: #292937;
+    color: #fff;
 }
 
 .footer-text-main{
@@ -14,15 +15,26 @@
     height: 3.5rem;
     width: auto;
     margin-left: 2rem;
+    fill: #fff;
+    color: #fff;
 }
 
 .github-cat{
-    fill: black;
+    fill: #fff;
     margin-left: 2rem;
-    transition: transform 2s;
+    transition: all 2s;
     height: 3.5rem;
 
     &:hover{
         transform: rotate(360deg);
+        fill: $color-primary;
+
     }
+}
+
+.github-handle{
+    color: $color-primary;
+    font-weight: 400;
+    padding: 0 1rem;
+    text-decoration: none;
 }
