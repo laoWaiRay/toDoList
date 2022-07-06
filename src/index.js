@@ -9,8 +9,6 @@ const titleInput = document.querySelector('#title');
 const dueDateInput = document.querySelector('#dueDate');
 const priorityInput = document.querySelector('#priority');
 const descriptionInput = document.querySelector('#description');
-const completedInput = document.querySelector('#completed');
-
 
 
 const projectList = document.querySelector('.sidebar__project-list');
@@ -32,16 +30,19 @@ const Project = function(name){
     };
 }
 
-//Global Variables
-const projects = [];
-
-const defaultProject = Project('Default Project');
-projects.push(defaultProject);
-let currentProject = defaultProject;
-
-////
-
 const projectManager = (function(){        //module
+    
+    const projects = [];
+
+    const defaultProject = Project('Default Project');
+    projects.push(defaultProject);
+    let currentProject = defaultProject;
+
+    function getCurrentProject(){
+        return currentProject;
+    }
+
+
     function createProject(name){
         const newProject = Project(name);
         projects.push(newProject);
@@ -63,8 +64,8 @@ const projectManager = (function(){        //module
         project.name = newName;
     }
 
-    const getProjectToDos = function(project){
-        return project.toDoList;
+    const getProjectToDos = function(){
+        return currentProject.toDoList;
     }
 
     const showCurrentProject = function(){
@@ -76,6 +77,7 @@ const projectManager = (function(){        //module
     }
 
     return {
+        getCurrentProject,
         createProject,
         getProjects,
         getProject,
@@ -88,9 +90,10 @@ const projectManager = (function(){        //module
 
 const toDoManager = (function(){
 
-    const createToDo = function(project, title, dueDate, description, priority, completed){
+    const createToDo = function(project, title, dueDate, description, priority, completed=false){
         const newToDo = ToDoItem(title, dueDate, description, priority, completed);
         project.toDoList.push(newToDo);
+        console.log(newToDo.dueDate);
     }  
 
     const getToDo = function(project, title){
@@ -155,31 +158,83 @@ const domManager = (function(){
             toDoList.firstChild.remove();
         }
 
-        const toDos = projectManager.getProjectToDos(projectManager.getProject(currentProject.name));
+        const toDos = projectManager.getProjectToDos();                 // coupling between modules
         toDos.forEach(toDo => {
+
             const toDoItem = document.createElement('li');
             toDoItem.classList.add('to-do-item');
             toDoItem.append(toDo.title);
-            toDoList.append(toDoItem);
+            const toDoCheckbox = document.createElement('input');
+            toDoCheckbox.classList.add('to-do-item__checkbox');
+            toDoCheckbox.setAttribute('type', 'checkbox');
+
+
+            toDoCheckbox.addEventListener('change', () => {
+                toDo.completed = !toDo.completed;
+            })
             
-            toDoItem.addEventListener('click', ()=>{
-                console.log(`You clicked on ${toDo.title}`);
+
+
+            toDoList.append(toDoItem);
+            toDoItem.append(toDoCheckbox);
+            
+            toDoItem.addEventListener('dblclick', ()=>{
 
                 if(!toDoItem.nextElementSibling || toDoItem.nextElementSibling.className === 'to-do-item'){
-                    const toDoPopup = document.createElement('div');
+                    const toDoPopup = document.createElement('form');
                     toDoPopup.classList.add('to-do-popup');
-                    const toDoPopupDueDate = document.createElement('span');
-                    toDoPopupDueDate.classList.add('to-do-popup__due-date');
-                    toDoPopupDueDate.append(toDo.dueDate);
-                    const toDoPopupDescription = document.createElement('p');
-                    toDoPopupDescription.classList.add('to-do-popup__description');
-                    toDoPopupDescription.append(toDo.description);
 
+                    const toDoPopupDueDate = document.createElement('input');
+                    toDoPopupDueDate.classList.add('to-do-popup__due-date', 'display-block');
+                    toDoPopupDueDate.setAttribute('type', 'date');
+                    toDoPopupDueDate.value = (toDo.dueDate);
+                    toDoPopupDueDate.addEventListener('change', ()=>{
+                        toDo.dueDate = toDoPopupDueDate.value;
+                    })
+
+                    const toDoPopupDescription = document.createElement('textarea');
+                    toDoPopupDescription.classList.add('to-do-popup__description', 'display-block');
+                    toDoPopupDescription.append(toDo.description);
+                    toDoPopupDescription.addEventListener('change', ()=>{
+                        toDo.description = toDoPopupDescription.value;
+                    })
+
+                    const toDoPopupPriorityLabel = document.createElement('label');
+                    toDoPopupPriorityLabel.classList.add('to-do-popup__label', 'display-block');
+                    toDoPopupPriorityLabel.setAttribute('for', 'toDoPopupPriority');
+                    toDoPopupPriorityLabel.append('Priority: ');
+
+                    const toDoPopupPriority = document.createElement('input');
+                    toDoPopupPriority.id = 'toDoPopupPriority';
+                    toDoPopupPriority.classList.add('to-do-popup__priority', 'display-block');
+                    toDoPopupPriority.setAttribute('type', 'range');
+                    toDoPopupPriority.setAttribute('min', '1');
+                    toDoPopupPriority.setAttribute('max', '3');
+                    toDoPopupPriority.setAttribute('step', '1');
+                    toDoPopupPriority.value = toDo.priority;
+                    toDoPopupPriority.addEventListener('change', ()=>{
+                        toDo.priority = toDoPopupPriority.value;
+                    })
+
+                    const closeBtn = document.createElement('button');
+                    closeBtn.classList.add('to-do-popup__close');
+                    closeBtn.append('x');
+                    closeBtn.addEventListener('click', ()=>{
+                        const currentProject = projectManager.getCurrentProject();
+                        toDoManager.deleteToDo(currentProject, toDoManager.getToDo(currentProject, toDo.title));
+                        domManager.showToDos();
+                    })
+
+                    toDoItem.append(closeBtn);
+                    
                     toDoItem.insertAdjacentElement('afterend', toDoPopup);
-                    toDoPopup.append(toDoPopupDueDate, toDoPopupDescription);
+                    toDoPopup.append(toDoPopupDueDate, toDoPopupDescription, toDoPopupPriorityLabel, toDoPopupPriority);
+
+
                 } else if(toDoItem.nextElementSibling && toDoItem.nextElementSibling.className === 'to-do-popup'){
                     const nextElement = toDoItem.nextElementSibling;
                     nextElement.remove();
+                    toDoItem.lastChild.remove();
                 }
             })
         })
@@ -195,7 +250,7 @@ const domManager = (function(){
 
 
 domManager.showProjects();
-domManager.showToDos();
+// domManager.showToDos();
  
 
 ///////////////////////////////////////////////////////////
@@ -205,13 +260,13 @@ domManager.showToDos();
 
 createToDoForm.addEventListener('submit', (e)=>{
     e.preventDefault();
+    if (!titleInput.value) return;
     toDoManager.createToDo(
-        projectManager.getProject(currentProject.name), 
+        projectManager.getCurrentProject(), 
         titleInput.value,
         dueDateInput.value, 
         descriptionInput.value, 
         priorityInput.value,
-        completedInput.value
     );
     
     domManager.showToDos();
@@ -224,10 +279,10 @@ createToDoForm.addEventListener('submit', (e)=>{
 
 createProjectForm.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const newProjectName = newProjectNameInput.value;
-    projectManager.createProject(newProjectName);
-
+    if (!newProjectNameInput.value) return;
+    projectManager.createProject(newProjectNameInput.value);
     domManager.showProjects();
+    newProjectNameInput.value = '';
 })
 
 
