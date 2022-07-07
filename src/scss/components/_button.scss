@@ -1,9 +1,15 @@
-.btn-close-project{
+button{
     background-color: transparent;
-    border: 0;
+    border: 1px solid #fff;
     font-size: 2rem;
-    font-weight: 300;
+    font-weight: inherit;
     font-family: inherit;
+    color: inherit;
+}
+
+.btn-close-project{
+    border: 0;
+    font-weight: 300;
     color: rgba(255, 255, 255, 0.5);
     position: relative;
 
@@ -11,4 +17,30 @@
         cursor: pointer;
         color: #fff;
     }
+}
+
+
+
+
+.btn-group{
+    display: inline-block;
+
+    &__label{
+        display: inline-block;
+        margin-right: 1rem;
+    }
+
+    &__btn{
+        padding: .5rem 2rem;
+        border-radius: 3px;
+
+        &:hover{
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.priority-btn.active{
+    background-color: $color-primary;
 }

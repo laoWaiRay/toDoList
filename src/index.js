@@ -5,16 +5,6 @@ import sprite from "./sprite.svg";
 
 //DOM Query Selectors
 
-
-const createToDoForm = document.querySelector('#createToDoForm');
-const createToDoFormInputs = document.querySelectorAll('#createToDoForm .form__input');
-const titleInput = document.querySelector('#title');
-const dueDateInput = document.querySelector('#dueDate');
-const priorityInput = document.querySelector('#priority');
-const descriptionInput = document.querySelector('#description');
-
-
-
 const projectList = document.querySelector('.project-list');
 const toDoList = document.querySelector('.to-do-list');
 
@@ -57,7 +47,82 @@ createProjectBtn.addEventListener('click', (e) => {
     })
 })
 
+const toDoFormTemplate = document.getElementById('to-do-form-template');
+const createToDoBtn = document.querySelector('.create-to-do-btn');
 
+createToDoBtn.addEventListener('click', ()=>{
+    const formTemplate = document.importNode(toDoFormTemplate.content, true);
+    toDoList.append(formTemplate);
+
+    const titleInput = document.querySelector('#title');
+    const dueDateInput = document.querySelector('#dueDate');
+    const descriptionInput = document.querySelector('#description');
+    const priorityLow = document.querySelector('#priority-low');
+    const priorityMedium = document.querySelector('#priority-medium');
+    const priorityHigh = document.querySelector('#priority-high');
+    const priorityBtns = document.querySelectorAll('.priority-btn');
+
+    titleInput.focus();
+
+    priorityLow.addEventListener('click', (e)=>{
+        console.log('OK, set to low')
+        priorityBtns.forEach(btn => btn.classList.remove('active'))
+        priorityLow.classList.add('active')
+    })
+    priorityMedium.addEventListener('click', ()=>{
+        console.log('OK, set to med')
+        priorityBtns.forEach(btn => btn.classList.remove('active'))
+        priorityMedium.classList.add('active')
+    })
+    priorityHigh.addEventListener('click', ()=>{
+        console.log('OK, set to hi')
+        priorityBtns.forEach(btn => btn.classList.remove('active'))
+        priorityHigh.classList.add('active')
+    })
+
+
+    descriptionInput.addEventListener('keydown', (e)=>{
+        const keyCode = e.code;
+        if(keyCode === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!titleInput.value) return;
+
+            const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains('active'));
+            const priorityValue = activeBtn.innerText.toLowerCase();
+    
+            toDoManager.createToDo(
+                projectManager.getCurrentProject(), 
+                titleInput.value,
+                dueDateInput.value, 
+                descriptionInput.value, 
+                priorityValue
+            );
+            
+            domManager.showToDos();
+        }
+    })
+
+    titleInput.addEventListener('keydown', (e)=>{
+        const keyCode = e.code;
+        if(keyCode === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!titleInput.value) return;
+
+            const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains('active'));
+            const priorityValue = activeBtn.innerText.toLowerCase();
+    
+            toDoManager.createToDo(
+                projectManager.getCurrentProject(), 
+                titleInput.value,
+                dueDateInput.value, 
+                descriptionInput.value, 
+                priorityValue
+            );
+            
+            domManager.showToDos();
+        }
+    })
+})
 
 
 
@@ -175,10 +240,11 @@ const toDoManager = (function(){
         project.toDoList.splice(index, 1);
     }
 
-    const editToDo = function(project, toDoItem, title, dueDate, description, priority, completed){
+    const editToDo = function(toDoItem, title, dueDate, description, priority, completed=false){
+        const currentProject = projectManager.getCurrentProject();
         const updatedToDo = ToDoItem(title, dueDate, description, priority, completed);
-        const index = project.toDoList.findIndex(item => item.title === toDoItem.title);
-        project.toDoList.splice(index, 1, updatedToDo);
+        const index = currentProject.toDoList.findIndex(item => item.title === toDoItem.title);
+        currentProject.toDoList.splice(index, 1, updatedToDo);
     }
 
     return {
@@ -306,70 +372,88 @@ const domManager = (function(){
             toDoCheckbox.addEventListener('change', () => {
                 toDo.completed = !toDo.completed;
             })
-            
-
 
             toDoList.append(toDoItem);
             toDoItem.append(toDoCheckbox);
             
             toDoItem.addEventListener('dblclick', ()=>{
+                const formTemplate = document.importNode(toDoFormTemplate.content, true);
+                toDoItem.replaceWith(formTemplate);
+                const titleInput = document.querySelector('#title');
+                const dueDateInput = document.querySelector('#dueDate');
+                const descriptionInput = document.querySelector('#description');
+                const priorityLow = document.querySelector('#priority-low');
+                const priorityMedium = document.querySelector('#priority-medium');
+                const priorityHigh = document.querySelector('#priority-high');
+                const priorityBtns = document.querySelectorAll('.priority-btn');
 
-                if(!toDoItem.nextElementSibling || toDoItem.nextElementSibling.className === 'to-do-item'){
-                    const toDoPopup = document.createElement('form');
-                    toDoPopup.classList.add('to-do-popup');
+                titleInput.focus();
 
-                    const toDoPopupDueDate = document.createElement('input');
-                    toDoPopupDueDate.classList.add('to-do-popup__due-date', 'display-block');
-                    toDoPopupDueDate.setAttribute('type', 'date');
-                    toDoPopupDueDate.value = (toDo.dueDate);
-                    toDoPopupDueDate.addEventListener('change', ()=>{
-                        toDo.dueDate = toDoPopupDueDate.value;
-                    })
+                priorityLow.addEventListener('click', (e)=>{
+                    console.log('OK, set to low')
+                    priorityBtns.forEach(btn => btn.classList.remove('active'))
+                    priorityLow.classList.add('active')
+                })
+                priorityMedium.addEventListener('click', ()=>{
+                    console.log('OK, set to med')
+                    priorityBtns.forEach(btn => btn.classList.remove('active'))
+                    priorityMedium.classList.add('active')
+                })
+                priorityHigh.addEventListener('click', ()=>{
+                    console.log('OK, set to hi')
+                    priorityBtns.forEach(btn => btn.classList.remove('active'))
+                    priorityHigh.classList.add('active')
+                })
 
-                    const toDoPopupDescription = document.createElement('textarea');
-                    toDoPopupDescription.classList.add('to-do-popup__description', 'display-block');
-                    toDoPopupDescription.append(toDo.description);
-                    toDoPopupDescription.addEventListener('change', ()=>{
-                        toDo.description = toDoPopupDescription.value;
-                    })
+                titleInput.value = toDo.title;
+                dueDateInput.value = toDo.dueDate;
+                descriptionInput.value = toDo.description;
+                priorityBtns.forEach(btn => btn.classList.remove('active'));
+                const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains(toDo.priority));
+                activeBtn.classList.add('active');
 
-                    const toDoPopupPriorityLabel = document.createElement('label');
-                    toDoPopupPriorityLabel.classList.add('to-do-popup__label', 'display-block');
-                    toDoPopupPriorityLabel.setAttribute('for', 'toDoPopupPriority');
-                    toDoPopupPriorityLabel.append('Priority: ');
 
-                    const toDoPopupPriority = document.createElement('input');
-                    toDoPopupPriority.id = 'toDoPopupPriority';
-                    toDoPopupPriority.classList.add('to-do-popup__priority', 'display-block');
-                    toDoPopupPriority.setAttribute('type', 'range');
-                    toDoPopupPriority.setAttribute('min', '1');
-                    toDoPopupPriority.setAttribute('max', '3');
-                    toDoPopupPriority.setAttribute('step', '1');
-                    toDoPopupPriority.value = toDo.priority;
-                    toDoPopupPriority.addEventListener('change', ()=>{
-                        toDo.priority = toDoPopupPriority.value;
-                    })
+                descriptionInput.addEventListener('keydown', (e)=>{
+                    const keyCode = e.code;
+                    if(keyCode === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!titleInput.value) return;
 
-                    const closeBtn = document.createElement('button');
-                    closeBtn.classList.add('to-do-popup__close');
-                    closeBtn.append('x');
-                    closeBtn.addEventListener('click', ()=>{
-                        const currentProject = projectManager.getCurrentProject();
-                        toDoManager.deleteToDo(currentProject, toDoManager.getToDo(currentProject, toDo.title));
+                        const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains('active'));
+                        const priorityValue = activeBtn.innerText.toLowerCase();
+                
+                        toDoManager.editToDo(
+                            toDo,
+                            titleInput.value,
+                            dueDateInput.value,
+                            descriptionInput.value,
+                            priorityValue,
+                        );
+                        
                         domManager.showToDos();
-                    })
+                    }
+                })
 
-                    toDoItem.append(closeBtn);
-                    
-                    toDoItem.insertAdjacentElement('afterend', toDoPopup);
-                    toDoPopup.append(toDoPopupDueDate, toDoPopupDescription, toDoPopupPriorityLabel, toDoPopupPriority);
+                titleInput.addEventListener('keydown', (e)=>{
+                    const keyCode = e.code;
+                    if(keyCode === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!titleInput.value) return;
 
-
-                } else if(toDoItem.nextElementSibling && toDoItem.nextElementSibling.className === 'to-do-popup'){
-                    const nextElement = toDoItem.nextElementSibling;
-                    nextElement.remove();
-                    toDoItem.lastChild.remove();
-                }
+                        const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains('active'));
+                        const priorityValue = activeBtn.innerText.toLowerCase();
+                
+                        toDoManager.editToDo(
+                            toDo,
+                            titleInput.value,
+                            dueDateInput.value,
+                            descriptionInput.value,
+                            priorityValue,
+                        );
+                        
+                        domManager.showToDos();
+                    }
+                })
             })
         })
     }
@@ -384,29 +468,3 @@ const domManager = (function(){
 
 
 domManager.showProjects();
-// domManager.showToDos();
- 
-
-///////////////////////////////////////////////////////////
-
-
-//////////////////////// Event Handlers //////////////////////
-
-createToDoForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if (!titleInput.value) return;
-
-    toDoManager.createToDo(
-        projectManager.getCurrentProject(), 
-        titleInput.value,
-        dueDateInput.value, 
-        descriptionInput.value, 
-        priorityInput.value,
-    );
-    
-    domManager.showToDos();
-
-    createToDoFormInputs.forEach(input => {
-        input.value = '';
-    })
-})
