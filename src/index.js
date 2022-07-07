@@ -50,9 +50,16 @@ createProjectBtn.addEventListener('click', (e) => {
 const toDoFormTemplate = document.getElementById('to-do-form-template');
 const createToDoBtn = document.querySelector('.create-to-do-btn');
 
-createToDoBtn.addEventListener('click', ()=>{
+createToDoBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+
+    const toDoListChildNodeArray = Array.from(toDoList.childNodes);
+    if(toDoListChildNodeArray.find(childNode => childNode.id === 'createToDoForm')) return;
+
     const formTemplate = document.importNode(toDoFormTemplate.content, true);
     toDoList.append(formTemplate);
+
+    const form = document.querySelector('#createToDoForm');
 
     const titleInput = document.querySelector('#title');
     const dueDateInput = document.querySelector('#dueDate');
@@ -65,21 +72,21 @@ createToDoBtn.addEventListener('click', ()=>{
     titleInput.focus();
 
     priorityLow.addEventListener('click', (e)=>{
-        console.log('OK, set to low')
         priorityBtns.forEach(btn => btn.classList.remove('active'))
         priorityLow.classList.add('active')
     })
     priorityMedium.addEventListener('click', ()=>{
-        console.log('OK, set to med')
         priorityBtns.forEach(btn => btn.classList.remove('active'))
         priorityMedium.classList.add('active')
     })
     priorityHigh.addEventListener('click', ()=>{
-        console.log('OK, set to hi')
         priorityBtns.forEach(btn => btn.classList.remove('active'))
         priorityHigh.classList.add('active')
     })
 
+    window.addEventListener('click', e => {
+        if(!form.contains(e.target)) form.remove();
+    })
 
     descriptionInput.addEventListener('keydown', (e)=>{
         const keyCode = e.code;
@@ -359,26 +366,39 @@ const domManager = (function(){
         }
 
         const toDos = projectManager.getProjectToDos();                 // coupling between modules
+
+        let index = 1;
+
         toDos.forEach(toDo => {
 
             const toDoItem = document.createElement('li');
             toDoItem.classList.add('to-do-item');
-            toDoItem.append(toDo.title);
+            const toDoTextWrapper = document.createElement('span');
+            toDoTextWrapper.classList.add('to-do-item__text-wrapper');
+            toDoTextWrapper.append(toDo.title);
             const toDoCheckbox = document.createElement('input');
             toDoCheckbox.classList.add('to-do-item__checkbox');
             toDoCheckbox.setAttribute('type', 'checkbox');
-
+            toDoCheckbox.id = `to-do-item__checkbox--${index}`;
+            const toDoCheckboxLabel = document.createElement('label');
+            toDoCheckboxLabel.classList.add(`to-do-item__checkbox-label--${index}`);
+            toDoCheckboxLabel.classList.add('to-do-item__checkbox-label');
+            toDoCheckboxLabel.setAttribute('for', `to-do-item__checkbox--${index}`);
 
             toDoCheckbox.addEventListener('change', () => {
                 toDo.completed = !toDo.completed;
             })
 
             toDoList.append(toDoItem);
-            toDoItem.append(toDoCheckbox);
+            toDoItem.append(toDoCheckbox, toDoCheckboxLabel, toDoTextWrapper);    
             
+            if(toDo.completed === true) toDoCheckbox.checked = true;
+
+
             toDoItem.addEventListener('dblclick', ()=>{
                 const formTemplate = document.importNode(toDoFormTemplate.content, true);
                 toDoItem.replaceWith(formTemplate);
+                const form = document.querySelector('#createToDoForm');
                 const titleInput = document.querySelector('#title');
                 const dueDateInput = document.querySelector('#dueDate');
                 const descriptionInput = document.querySelector('#description');
@@ -390,17 +410,14 @@ const domManager = (function(){
                 titleInput.focus();
 
                 priorityLow.addEventListener('click', (e)=>{
-                    console.log('OK, set to low')
                     priorityBtns.forEach(btn => btn.classList.remove('active'))
                     priorityLow.classList.add('active')
                 })
                 priorityMedium.addEventListener('click', ()=>{
-                    console.log('OK, set to med')
                     priorityBtns.forEach(btn => btn.classList.remove('active'))
                     priorityMedium.classList.add('active')
                 })
                 priorityHigh.addEventListener('click', ()=>{
-                    console.log('OK, set to hi')
                     priorityBtns.forEach(btn => btn.classList.remove('active'))
                     priorityHigh.classList.add('active')
                 })
@@ -412,6 +429,14 @@ const domManager = (function(){
                 const activeBtn = Array.from(priorityBtns).find(el => el.classList.contains(toDo.priority));
                 activeBtn.classList.add('active');
 
+
+                window.addEventListener('click', e => {
+                    if(form.contains(e.target)){
+                        console.log('clicked in form')
+                    } else{
+                        form.replaceWith(toDoItem);
+                    }
+                })
 
                 descriptionInput.addEventListener('keydown', (e)=>{
                     const keyCode = e.code;
@@ -428,6 +453,7 @@ const domManager = (function(){
                             dueDateInput.value,
                             descriptionInput.value,
                             priorityValue,
+                            toDo.completed
                         );
                         
                         domManager.showToDos();
@@ -449,12 +475,15 @@ const domManager = (function(){
                             dueDateInput.value,
                             descriptionInput.value,
                             priorityValue,
+                            toDo.completed
                         );
                         
                         domManager.showToDos();
                     }
                 })
             })
+
+            index++;
         })
     }
 

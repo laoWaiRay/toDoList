@@ -2,11 +2,8 @@
     position: fixed;
     height: 100vh;
     width: 100vw;
-    // background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url(/dist/assets/hero.jpg);
     background: linear-gradient(to bottom right,#293038, #31475a);
-    // background-size: cover;
-    // background-position: center;
-    // background-repeat: no-repeat;
+
     z-index: -1;
 }
 
@@ -20,4 +17,63 @@
 
 .to-do-container{
     padding: 4rem 8rem;
+}
+
+.to-do-item{
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    &__checkbox{
+        position: absolute;
+        left: -5rem;
+        height: 3rem;
+        width: 3rem;
+        display: none;
+    }
+    
+    &__checkbox-label{
+        height: 2rem;
+        width: 2rem;
+        background-color: #fff;
+        position: absolute;
+        left: -4rem;
+        border-radius: 50%;
+        transition: transform 300ms;
+
+        &::after{
+            content: "";
+            height: 50%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            position: absolute;
+            background-color: #242424;
+            z-index: 3;
+            transform: translate(50%,50%);
+            visibility: hidden;
+        }
+
+        &:hover{
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        &.active{
+            visibility: visible;
+        }
+    }
+}
+
+.to-do-item__checkbox:checked ~ .to-do-item__checkbox-label{
+    opacity: .5;
+}
+
+.to-do-item__checkbox:checked ~ .to-do-item__checkbox-label::after{
+    visibility: visible;
+}
+
+.to-do-item__checkbox:checked ~ .to-do-item__text-wrapper{
+    text-decoration: line-through;
+    opacity: .5;
 }
