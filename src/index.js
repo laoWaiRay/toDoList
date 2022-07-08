@@ -1,6 +1,5 @@
 //Dependencies List
 import "./scss/main.scss";
-import heroImage from "./img/hero.jpg";
 import sprite from "./sprite.svg";
 
 
