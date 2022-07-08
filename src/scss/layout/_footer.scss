@@ -9,12 +9,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    @media only screen and (max-width:375px){
+        margin-bottom: 1rem;
+    }
 }
 
 .odin-logo{
     height: 3.5rem;
     width: auto;
-    margin-left: 2rem;
+    margin-left: 2.5rem;
     fill: #fff;
     color: #fff;
 }
@@ -28,7 +32,10 @@
     &:hover{
         transform: rotate(360deg);
         fill: $color-primary;
+    }
 
+    @media only screen and (max-width:375px){
+        margin-left: 30px;
     }
 }
 
@@ -37,4 +44,28 @@
     font-weight: 400;
     padding: 0 1rem;
     text-decoration: none;
+}
+
+.footer-text{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media only screen and (max-width:375px){
+        flex-direction: column;
+    }
+}
+
+.footer-text-main,
+.footer-logos{
+    display: inline-block; 
+}
+
+.footer-logos{
+    @media only screen and (max-width:375px){
+        margin-left: -15px;
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+    }
 }

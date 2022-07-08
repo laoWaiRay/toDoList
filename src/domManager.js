@@ -1,4 +1,5 @@
 import projectManager from "./projectManager";
+import sectionController from "./sectionController";
 import toDoManager from "./toDoManager";
 
 const projectList = document.querySelector('.project-list');
@@ -26,6 +27,8 @@ const domManager = (function(){
                     projectManager.deleteProject(currentProject);
                     domManager.showProjects();
                     domManager.showToDos();
+                    sectionController.closeSection(0);
+                    sectionController.expandSection(0);
                 })
             } 
         })

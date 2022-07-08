@@ -31,6 +31,7 @@ label{
         border: 0;
         outline: none;
         padding: 1rem 4rem;
+        width: 100%;
         
 
         &--to-do{
@@ -44,10 +45,20 @@ label{
     }
 }
 
+.create-project-form{
+    width: 100%;
+    background-color: #242426;
+}
+
 #createToDoForm{
     margin: 1rem 0;
     border-radius: 3px;
     position: relative;
+
+    @media only screen and (max-width: 760px){
+        width: calc(100% + 4rem);
+        margin-left: -4rem;
+    }
 }
 
 input[type=date]{

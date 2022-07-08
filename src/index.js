@@ -4,6 +4,7 @@ import sprite from "./sprite.svg";
 import projectManager from "./projectManager";
 import toDoManager from "./toDoManager";
 import domManager from "./domManager";
+import sectionController from "./sectionController";
 
 //DOM Query Selectors
 
@@ -12,7 +13,7 @@ const toDoList = document.querySelector('.to-do-list');
 const createProjectBtn = document.querySelector('.create-project-btn');
 const toDoFormTemplate = document.getElementById('to-do-form-template');
 const createToDoBtn = document.querySelector('.create-to-do-btn');
-
+const toggler = document.querySelector('.toggler');
 
 createProjectBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -20,16 +21,26 @@ createProjectBtn.addEventListener('click', (e) => {
 
     const form = document.createElement('form');
     const formInput = document.createElement('input');
+    form.classList.add('create-project-form')
     formInput.classList.add('form__input');
     formInput.setAttribute('type', 'text');
     formInput.setAttribute('placeholder', 'New Project');
     projectList.append(form);
     form.append(formInput);
+    sectionController.closeSection(0);
+    sectionController.expandSection(0);
     formInput.focus();
 
-    window.addEventListener('mousedown', e => {
-        if(!form.contains(e.target)) form.remove();
-    })
+    function removeForm(e){
+        if(!form.contains(e.target)) {
+            form.remove();
+            sectionController.closeSection(0);
+            sectionController.expandSection(0);
+            window.removeEventListener('mousedown', removeForm);
+        }
+    }
+
+    window.addEventListener('mousedown', removeForm);
 
     form.addEventListener('submit', (e)=>{
         e.preventDefault();
@@ -161,3 +172,28 @@ if (storageAvailable('localStorage')) {
 else {
     console.log('Too bad, no localStorage for us');
 }
+
+
+
+
+
+// Mobile nav toggler
+
+
+toggler.addEventListener('click', e => {
+    let isExpanded = sectionController.isExpanded();
+    if(isExpanded){
+        sectionController.closeSection(500)
+    } else{
+        sectionController.expandSection(500)
+    }
+    toggler.classList.toggle('flip-180')
+})
+
+let mql = window.matchMedia('(max-width: 760px)');
+
+mql.addEventListener('change', e => {
+    if(mql.matches === false && projectList.style.height === '0px'){
+        projectList.style.height = ''
+    }
+})

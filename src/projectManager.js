@@ -1,3 +1,5 @@
+import sectionController from "./sectionController";
+
 const Project = function(name){
     return {
         name,
@@ -77,6 +79,12 @@ const projectManager = (function(){        //module
         } else {
             changeCurrentProject(projects[0]);
         }
+
+        // sectionController.closeSection(0);
+        // sectionController.expandSection(0);
+
+        localStorage.clear();
+        populateStorage();          // save new projects array to storage
     }
 
     return {

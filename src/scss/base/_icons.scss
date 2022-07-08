@@ -1,5 +1,6 @@
 .icon-add-solid,
-.icon-plus{
+.icon-plus,
+.icon-circle-down{
     fill: #fff;
     width: 3.5rem;
     height: 3.5rem;
@@ -10,7 +11,18 @@
 
     &:hover{
         cursor: pointer;
-        transform: scale(1.1);
         fill: $color-primary;
+    }
+
+
+    @media only screen and (max-width: 760px){
+        margin-bottom: 0;
+    }
+}
+
+.icon-add-solid,
+.icon-plus{
+    &:hover{
+        transform: scale(1.2);
     }
 }
