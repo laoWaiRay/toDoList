@@ -19,6 +19,24 @@ button{
     }
 }
 
+.btn-close-to-do{
+    border: 0;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    right: 4rem;
+    visibility: hidden;
+
+    &:hover{
+        cursor: pointer;
+        color: #fff;
+    }
+}
+
+.form:hover .btn-close-to-do{
+    visibility: visible;
+}
+
 
 
 

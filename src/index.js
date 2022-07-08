@@ -3,6 +3,7 @@ import "./scss/main.scss";
 import heroImage from "./img/hero.jpg";
 import sprite from "./sprite.svg";
 
+
 //DOM Query Selectors
 
 const projectList = document.querySelector('.project-list');
@@ -25,7 +26,7 @@ createProjectBtn.addEventListener('click', (e) => {
     form.append(formInput);
     formInput.focus();
 
-    window.addEventListener('click', e => {
+    window.addEventListener('mousedown', e => {
         if(form.contains(e.target)){
             console.log('clicked in form')
         } else{
@@ -60,6 +61,7 @@ createToDoBtn.addEventListener('click', (e)=>{
     toDoList.append(formTemplate);
 
     const form = document.querySelector('#createToDoForm');
+    const closeBtn = document.querySelector('.btn-close-to-do');
 
     const titleInput = document.querySelector('#title');
     const dueDateInput = document.querySelector('#dueDate');
@@ -70,6 +72,10 @@ createToDoBtn.addEventListener('click', (e)=>{
     const priorityBtns = document.querySelectorAll('.priority-btn');
 
     titleInput.focus();
+
+    closeBtn.addEventListener('click', e => {
+        form.remove();
+    })
 
     priorityLow.addEventListener('click', (e)=>{
         priorityBtns.forEach(btn => btn.classList.remove('active'))
@@ -84,7 +90,7 @@ createToDoBtn.addEventListener('click', (e)=>{
         priorityHigh.classList.add('active')
     })
 
-    window.addEventListener('click', e => {
+    window.addEventListener('mousedown', e => {
         if(!form.contains(e.target)) form.remove();
     })
 
@@ -149,7 +155,7 @@ const Project = function(name){
 
 const projectManager = (function(){        //module
     
-    const projects = [];
+    let projects = [];
 
     const defaultProject = Project('Default Project');
     projects.push(defaultProject);
@@ -162,11 +168,19 @@ const projectManager = (function(){        //module
     function createProject(name){
         const newProject = Project(name);
         projects.push(newProject);
+        localStorage.clear();
+        populateStorage();          // save new projects array to storage
         return newProject;
     }
 
     function getProjects(){
         return projects;
+    }
+
+    function setProjects(projectsArray){
+        projects = projectsArray;
+        currentProject = projectsArray[0];
+        console.dir(projects);
     }
 
     function getProject(name){
@@ -185,8 +199,8 @@ const projectManager = (function(){        //module
         return currentProject.toDoList;
     }
 
-    const showCurrentProject = function(){
-        console.log(currentProject);
+    const showCurrentProjects = function(){
+        console.dir(projects);
     }
 
     const changeCurrentProject = function(project){
@@ -215,10 +229,11 @@ const projectManager = (function(){        //module
         getCurrentProject,
         createProject,
         getProjects,
+        setProjects,
         getProject,
         editProjectName,
         getProjectToDos,
-        showCurrentProject,
+        showCurrentProjects,
         changeCurrentProject,
         deleteProject,
         createDefaultProject
@@ -232,6 +247,8 @@ const toDoManager = (function(){
     const createToDo = function(project, title, dueDate, description, priority, completed=false){
         const newToDo = ToDoItem(title, dueDate, description, priority, completed);
         project.toDoList.push(newToDo);
+        localStorage.clear();
+        populateStorage();
     }  
 
     const getToDo = function(project, title){
@@ -332,7 +349,7 @@ const domManager = (function(){
                 form.append(formInput);
                 formInput.focus();
 
-                window.addEventListener('click', e => {
+                window.addEventListener('mousedown', e => {
                     if(form.contains(e.target)){
                         console.log('clicked in form')
                     } else{
@@ -367,6 +384,7 @@ const domManager = (function(){
 
         const toDos = projectManager.getProjectToDos();                 // coupling between modules
 
+
         let index = 1;
 
         toDos.forEach(toDo => {
@@ -399,6 +417,8 @@ const domManager = (function(){
                 const formTemplate = document.importNode(toDoFormTemplate.content, true);
                 toDoItem.replaceWith(formTemplate);
                 const form = document.querySelector('#createToDoForm');
+                const closeBtn = document.querySelector('.btn-close-to-do');
+
                 const titleInput = document.querySelector('#title');
                 const dueDateInput = document.querySelector('#dueDate');
                 const descriptionInput = document.querySelector('#description');
@@ -406,6 +426,11 @@ const domManager = (function(){
                 const priorityMedium = document.querySelector('#priority-medium');
                 const priorityHigh = document.querySelector('#priority-high');
                 const priorityBtns = document.querySelectorAll('.priority-btn');
+
+                closeBtn.addEventListener('click', e => {
+                    toDoManager.deleteToDo(projectManager.getCurrentProject(), toDo);
+                    form.remove();
+                })
 
                 titleInput.focus();
 
@@ -430,7 +455,7 @@ const domManager = (function(){
                 activeBtn.classList.add('active');
 
 
-                window.addEventListener('click', e => {
+                window.addEventListener('mousedown', e => {
                     if(form.contains(e.target)){
                         console.log('clicked in form')
                     } else{
@@ -495,5 +520,53 @@ const domManager = (function(){
 })()
 
 
+//Local Storage
 
-domManager.showProjects();
+function storageAvailable(type) {
+    var storage;
+    try {
+        storage = window[type];
+        var x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            (storage && storage.length !== 0);
+    }
+}
+
+function populateStorage() {
+    localStorage.setItem('projects', JSON.stringify(projectManager.getProjects()));  // local storage only supports string type,
+                                                                                    // must use JSON.stringify and JSON.parse
+    console.dir(JSON.parse(localStorage.getItem('projects')));
+}
+
+if (storageAvailable('localStorage')) {
+    console.log('Yippee! We can use localStorage awesomeness');
+
+    if(!localStorage.getItem('projects')) {
+        populateStorage();
+    } else {
+        const projects = JSON.parse(localStorage.getItem('projects'));
+        projectManager.setProjects(projects);
+        projectManager.showCurrentProjects();
+        domManager.showProjects();
+        domManager.showToDos();
+    }
+
+}
+else {
+    console.log('Too bad, no localStorage for us');
+}
