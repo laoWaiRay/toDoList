@@ -9,7 +9,6 @@ const projectList = document.querySelector('.project-list');
 const toDoList = document.querySelector('.to-do-list');
 
 const hero = document.querySelector('.hero');
-hero.src = heroImage;
 
 const createProjectBtn = document.querySelector('.create-project-btn');
 
