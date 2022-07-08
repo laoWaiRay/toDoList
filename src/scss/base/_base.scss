@@ -29,3 +29,7 @@ li{
     stroke: currentColor;
     fill: currentColor;
 }
+
+form::-webkit-scrollbar {
+    display: none;
+}
