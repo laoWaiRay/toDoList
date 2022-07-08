@@ -30,7 +30,7 @@
 
 
         <div class="to-do-container">
-            <div class="heading-container">
+            <div class="heading-container heading-container--to-do">
                 <h1 class="heading-primary">To Dos</h1>
                 <svg class="create-to-do-btn icon icon-add-solid">
                     <use href="./assets/sprite.svg#icon-plus"></use>
@@ -79,25 +79,27 @@
  
 
     <template id="to-do-form-template">
-        <div class="form-container form-container--createToDo">
-            <form action="#" class="form" id="createToDoForm">
+            <form action="" class="form" id="createToDoForm">
+                <span class="btn-close-to-do">x</span>
                 <div class="form__group">
-                    <input class="form__input" id="title" name="title" type="text" placeholder="New To Do">
+                    <input class="form__input form__input--to-do width-90" id="title" name="title" type="text" placeholder="New To Do">
                 </div>
                 <div class="form__group">
                     <label for="dueDate">Due Date: </label>
-                    <input class="form__input" id="dueDate" name="dueDate" type="date" placeholder="Due Date">
+                    <input class="form__input form__input--to-do" id="dueDate" name="dueDate" type="date" placeholder="Due Date">
                 </div>
                 <div class="form__group">
-                    <label for="priority" class="form__label">Priority: </label>
-                    <input class="form__input" id="priority" name="priority" type="range" min="1" max="3" step="1" placeholder="Priority">
+                    <div class="btn-group__label">Priority: </div>
+                    <div class="btn-group" id="btn-group">
+                        <button class="btn-group__btn priority-btn low active" type="button" id="priority-low">Low</button>
+                        <button class="btn-group__btn priority-btn medium" type="button" id="priority-medium">Medium</button>
+                        <button class="btn-group__btn priority-btn high" type="button" id="priority-high">High</button>
+                    </div>
                 </div>
                 <div class="form__group">
-                    <textarea class="form__input" id="description" name="description" cols="30" rows="5" placeholder="Description"></textarea>
+                    <textarea class="form__input form__input--to-do full-width" id="description" name="description" cols="50" rows="2" placeholder="Description"></textarea>
                 </div>
-                <button class="form__submit-btn">Submit</button>
             </form>
-        </div>
     </template>
 
 </body>
