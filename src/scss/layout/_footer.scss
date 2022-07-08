@@ -34,7 +34,7 @@
         fill: $color-primary;
     }
 
-    @media only screen and (max-width:375px){
+    @media only screen and (max-width:496px){
         margin-left: 30px;
     }
 }
@@ -50,7 +50,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    @media only screen and (max-width:375px){
+    @media only screen and (max-width:496px){
         flex-direction: column;
     }
 }
@@ -61,7 +61,7 @@
 }
 
 .footer-logos{
-    @media only screen and (max-width:375px){
+    @media only screen and (max-width:496px){
         margin-left: -15px;
         width: 100%;
         text-align: center;
