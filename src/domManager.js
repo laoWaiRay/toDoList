@@ -130,7 +130,7 @@ const domManager = (function(){
             if(toDo.completed === true) toDoCheckbox.checked = true;
 
 
-            toDoItem.addEventListener('click', ()=>{
+            toDoItem.addEventListener('dblclick', ()=>{
                 const formTemplate = document.importNode(toDoFormTemplate.content, true);
                 toDoItem.replaceWith(formTemplate);
                 const form = document.querySelector('#createToDoForm');
