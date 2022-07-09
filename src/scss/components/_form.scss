@@ -61,38 +61,22 @@ label{
     }
 }
 
-input[name=dueDate]{
-    color: red;
-    border: 1px solid red;
-    z-index: 999;
-}
-
 ////////
 
 input[type=date] {
     height: 35px;
     margin: 0 auto;
-    width: 100%;
-    font-family: arial, sans-serif;
-    font-size: 18px;
-    font-weight: bold;
+    width: 17rem;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
     text-transform: uppercase;
-    background-color: lighten(#2f2f2f,40%);
+    background-color: transparent;
     outline: none;
-    border: 0;
+    border: 1px solid #fff;
     border-radius: 3px;
     padding: 0 3px;
     color: #fff;
-    
-    &::-webkit-datetime-edit-month-field {
-      color: red;
-    }
-    &::-webkit-datetime-edit-day-field {
-      color: white;
-    }
-    &::-webkit-datetime-edit-year-field {
-      color: blue;
-    }
     
     &::-webkit-clear-button {
       font-size: 18px;
@@ -106,15 +90,6 @@ input[type=date] {
     }
     &::-webkit-calendar-picker-indicator {
       font-size: 18px;
-      
-          
-      &:hover {
-        background-color: lighten(#2f2f2f,40%);
-        color: darken(#fff, 10%);
-        cursor: pointer;
-      }
-      &:active {
-        color: blue;
-      }
+      filter: invert(1);
     }
   }
