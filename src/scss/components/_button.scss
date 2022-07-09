@@ -41,7 +41,7 @@ button{
 
 
 .btn-group{
-    display: inline-block;
+    display: flex;
 
     &__label{
         display: inline-block;
@@ -49,7 +49,7 @@ button{
     }
 
     &__btn{
-        padding: .5rem 2rem;
+        padding: .5rem 1rem;
         border-radius: 3px;
 
         &:hover{
