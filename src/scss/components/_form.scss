@@ -61,8 +61,7 @@ label{
     }
 }
 
-
-input[type="date"]::-webkit-inner-spin-button,
-input[type="date"]::-webkit-calendar-picker-indicator {
-    display: block;
+input[name=dueDate]{
+    color: red;
+    border: 1px solid red;
 }
