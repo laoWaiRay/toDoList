@@ -31,7 +31,6 @@ label{
         border: 0;
         outline: none;
         padding: 1rem 4rem;
-        width: 100%;
         
 
         &--to-do{
@@ -58,6 +57,7 @@ label{
     @media only screen and (max-width: 760px){
         width: calc(100% + 4rem);
         margin-left: -4rem;
+        padding: 1rem 2rem;
     }
 }
 
